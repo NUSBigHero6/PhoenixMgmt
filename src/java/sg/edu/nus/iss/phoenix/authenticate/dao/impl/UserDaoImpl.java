@@ -16,6 +16,8 @@ import sg.edu.nus.iss.phoenix.authenticate.entity.Role;
 import sg.edu.nus.iss.phoenix.authenticate.entity.User;
 import sg.edu.nus.iss.phoenix.core.exceptions.NotFoundException;
 
+import java.sql.Statement;
+
 /**
  * User Data Access Object (DAO). This class contains all database handling that
  * is needed to permanently store and retrieve User object instances.
@@ -69,7 +71,7 @@ public class UserDaoImpl implements UserDao {
 	 * , sg.edu.nus.iss.phoenix.authenticate.entity.User)
 	 */
 	@Override
-	public void load(User valueObject) throws NotFoundException, SQLException {
+        public void load(User valueObject) throws NotFoundException, SQLException {
 
 		String sql = "SELECT * FROM user WHERE (id = ? ) ";
 		PreparedStatement stmt = null;
@@ -79,6 +81,29 @@ public class UserDaoImpl implements UserDao {
 			stmt.setString(1, valueObject.getId());
 
 			singleQuery(stmt, valueObject);
+
+		} finally {
+			if (stmt != null)
+				stmt.close();
+		}
+	}
+        
+	public void loadWeak(User valueObject) throws NotFoundException, SQLException {
+
+		String sql = "SELECT * FROM user WHERE (id = '" + valueObject.getId() + "') ";
+		Statement stmt = null;
+
+		try {
+                        stmt = this.connection.createStatement();
+                        ResultSet rs = stmt.executeQuery(sql);
+                        
+			while (rs.next()) {
+                            valueObject.setId(rs.getString("id"));
+                            valueObject.setPassword(rs.getString("password"));
+                            valueObject.setName(rs.getString("name"));
+                            valueObject.setRoles(createRoles(rs.getString("role")));
+                            
+                        }
 
 		} finally {
 			if (stmt != null)
@@ -389,7 +414,7 @@ public class UserDaoImpl implements UserDao {
 				stmt.close();
 		}
 	}
-
+        
 	/**
 	 * databaseQuery-method. This method is a helper method for internal use. It
 	 * will execute all database queries that will return multiple rows. The
