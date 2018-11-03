@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 
 /**
  * Servlet implementation class PhoenixFrontController
@@ -47,7 +48,7 @@ public class PhoenixFrontController extends HttpServlet {
 	 */
 	protected void processRequest(HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException {
-		String pathInfo = request.getPathInfo();
+		String pathInfo = URLEncoder.encode(request.getPathInfo(), "UTF-8");
 		String action = FCUtilities.stripPath(pathInfo);
 		System.out.println("PATH" + pathInfo);
 		System.out.println("ACTION" + action);
