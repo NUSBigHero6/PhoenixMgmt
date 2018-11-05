@@ -79,8 +79,7 @@ public class UserDaoImpl implements UserDao {
 		try {
 			stmt = this.connection.prepareStatement(sql);
 			stmt.setString(1, valueObject.getId());
-
-			singleQuery(stmt, valueObject);
+                        singleQuery(stmt, valueObject);
 
 		} finally {
 			if (stmt != null)
@@ -345,7 +344,7 @@ public class UserDaoImpl implements UserDao {
 		}
 
 		sql.append("ORDER BY id ASC ");
-
+                
 		// Prevent accidential full table results.
 		// Use loadAll if all rows must be returned.
 		if (first)
@@ -355,6 +354,33 @@ public class UserDaoImpl implements UserDao {
 					.toString()));
 
 		return searchResults;
+	}
+        
+        @Override
+        public boolean searchMatching(String uid, String password) throws SQLException {
+
+
+		boolean first = true;
+		String sql = "SELECT * FROM user WHERE id = ? AND password = ? ";
+		PreparedStatement stmt = null;
+
+
+		try {
+                    stmt = this.connection.prepareStatement(sql);
+			
+                    stmt.setString(1, uid);
+                    stmt.setString(2, password);
+                
+                    ResultSet result = stmt.executeQuery();
+                    if(result.getRow() > 0) {
+                        return true;
+                    }
+		} finally {
+			if (stmt != null)
+				stmt.close();
+		}
+                
+		return false;
 	}
 
 	/**

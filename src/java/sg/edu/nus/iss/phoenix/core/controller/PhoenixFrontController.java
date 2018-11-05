@@ -12,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
 
 /**
  * Servlet implementation class PhoenixFrontController
@@ -53,9 +52,9 @@ public class PhoenixFrontController extends HttpServlet {
 	 */
 	protected void processRequest(HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException {
-		String pathInfo = URLEncoder.encode(request.getPathInfo(), "UTF-8");
+		String pathInfo = request.getPathInfo();
 		String action = FCUtilities.stripPath(pathInfo);
-                String requestUrl = request.getRequestURL().toString();
+                String requestUrl =  request.getRequestURI() + '?' + request.getQueryString();
                 String result;
 		System.out.println("PATH" + pathInfo);
 		System.out.println("ACTION" + action);
@@ -99,7 +98,7 @@ public class PhoenixFrontController extends HttpServlet {
 		case "logout":
 			return "/LoginController/logout";
                 case "error":
-                        return "/error.jsp";
+                        return "/invalid.jsp";
 		default:
 			return "/welcome.jsp";
 		}
@@ -136,30 +135,30 @@ public class PhoenixFrontController extends HttpServlet {
 	 */
 	protected boolean isInvalidPath(String path) {
 		if (path.contains("WEB-INF") || path.contains("META-INF")) {
-				logger.warn("Path with \"WEB-INF\" or \"META-INF\": [" + path + "]");
-				return true;
+                    logger.warn("Path with \"WEB-INF\" or \"META-INF\": [" + path + "]");
+                    return true;
 		}
 		if (path.contains("1=1") || path.contains("'1'='1'") || path.contains("1 = 1") || path.contains("'1' = '1'")) {
-				logger.warn("Invalid Path: contains always true condition ");
-				return true;
+                    logger.warn("Invalid Path: contains always true condition ");
+                    return true;
 		}
 		if (path.contains("#") || path.contains("--")) {
-				logger.warn("Invalid Path: contains syntax to introduce comments ");
-				return true;
+                    logger.warn("Invalid Path: contains syntax to introduce comments ");
+                    return true;
 		}
 		if (path.contains(":/")) {
-				String relativePath = (path.charAt(0) == '/' ? path.substring(1) : path);
-				if (relativePath.startsWith("url:")) {
-						logger.warn("Path represents URL or has \"url:\" prefix: [" + path + "]");
-						return true;
-				}
+                    String relativePath = (path.charAt(0) == '/' ? path.substring(1) : path);
+                    if (relativePath.contains("url:")) {
+                        logger.warn("Path represents URL or has \"url:\" prefix: [" + path + "]");
+                        return true;
+                    }
 		}
 		if (path.contains("..")) {
-				//path = StringUtils.cleanPath(path);
-				if (path.contains("../")) {
-						logger.warn("Invalid Path: contains \"../\".");
-						return true;
-				}
+                    //path = StringUtils.cleanPath(path);
+                    if (path.contains("../")) {
+                                    logger.warn("Invalid Path: contains \"../\".");
+                                    return true;
+                    }
 		}
 		return false;
 	}

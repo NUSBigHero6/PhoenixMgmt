@@ -94,11 +94,11 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.encoder-jsp-1.2.jar}</file>
+                    <file>${file.reference.common-lang3.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.common-lang3.jar}</file>
+                    <file>${file.reference.encoder-jsp-1.2.2.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>
